@@ -1,0 +1,258 @@
+---
+title: "IGP DATA ANALYSIS"
+author: "PROJECT TEAM 1"
+date: "August 22"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(error = TRUE,comment=NA) 
+```
+ Data Description:
+ This dataset is part of a larger dataset that has been collected to help to know the impact of Covid 19 Pandemic on the employment profession in the 4 regions of the UK and to also observe the various shifts that occurred in different professions as a result of this, paying particular attention to professions that gained, loss and constant.
+
+```{r}
+source("mypackages.R")
+source("helperFunctions.R")
+
+library(tidyr)
+
+```
+
+```{r}
+# load dataset
+employment_data <- read.csv("merged_data.csv")
+
+#glimpse the loaded csv file to check structure of dataset such as no of rows, no of column and variables data type
+```
+
+```{r}
+library(dplyr)
+
+```
+Data Preparation
+
+We are interested in modelling the employment by professions where Country is equal to Scotland.
+
+ Rows of data with this property are selected and used to perform the rest of the analysis.
+
+
+```{r}
+#Select rows that satisfies the condition specified in the modelling
+employ_scotland<-subset(employment_data,employment_data$Country == "Scotland")
+```
+
+```{r}
+tinytex::install_tinytex()
+```
+
+
+```{r}
+glimpse(employ_scotland)
+```
+The following exploratory data analysis will be done using descriptive statistics, exploratory graphs and linear correlation.
+
+summary(): To measure central tendency by checking for variation in mean, median, also for outliers. If variation or difference between mean and median is much then it means there's outliers.
+
+Skimr: this is another method used for summarizing data. It gives a broad set of summary statistics with a single function call.
+
+```{r}
+summary(employ_scotland)
+```
+```{r}
+is.null(employ_scotland)
+skimr::skim(employ_scotland)
+```
+Summary shows there are no outliers as variations between mean and median in all professions are minimal.
+We checked for null values and got a boolean FALSE.
+
+EXPLORATORY GRAPHS
+
+5 professions were selected and grouped into 3 categories and all visually analysed.
+
+```{r}
+category1 <- employ_scotland[,c("Date","Country","X11.Corporate.managers.and.directors","X21.Science..research..engineering.and.technology.professionals","X22.Health.professionals","X23.Teaching.and.educational.professionals","X24.Business..media.and.public.service.professionals")]
+```
+
+Here we make use of pivot longer which converts wide data into long data using the function pivot longer.Line graphs were plotted showing 5 professions in each categories.
+```{r}
+#library(tidyverse)
+category1_long <- category1%>%
+  pivot_longer(
+   cols = starts_with("X")
+  )
+```
+
+```{r}
+ggplot(category1_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="EMPLOYMENTS CATEGORY1 IN SCOTLAND")
+```
+
+
+```{r}
+category2 <- employ_scotland[,c("Date","Country","X33.Protective.service.occupations", "X34.Culture..media.and.sports.occupations","X41.Administrative.occupations","X42.Secretarial.and.related.occupations","X51.Skilled.agricultural.and.related.trades")]
+```
+
+```{r}
+category2_long <- category2%>%
+  pivot_longer(
+   cols = starts_with("X")
+  )
+```
+
+```{r}
+ggplot(category2_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="EMPLOYMENTS CATEGORY2 IN SCOTLAND")
+```
+```{r}
+category3 <- employ_scotland[,c("Date","Country","X53.Skilled.construction.and.building.trades", "X61.Caring.personal.service.occupations", "X62.Leisure..travel.and.related.personal.service.occupations","X81.Process..plant.and.machine.operatives","X82.Transport.and.mobile.machine.drivers.and.operatives")]
+```
+
+```{r}
+category3_long <- category3%>%
+  pivot_longer(
+   cols = starts_with("X")
+  )
+```
+
+```{r}
+ggplot(category3_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="EMPLOYMENTS CATEGORY3 IN SCOTLAND")
+```
+
+```{r}
+protective<- employ_scotland[,c("Date","Country","X33.Protective.service.occupations")]
+```
+
+```{r}
+protective2 <- protective%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+From the categories plotted, professions with notable changes were plotted individually to further highlight the changes.
+
+```{r}
+ggplot(protective2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="PROTECTIVE PROFESSION IN SCOTLAND")
+```
+This shows there was a continual decline with effect initializing from 2019 but with significant COVID effect in 2020
+
+
+
+```{r}
+science<- employ_scotland[,c("Date","Country","X21.Science..research..engineering.and.technology.professionals")]
+```
+
+```{r}
+science2 <- science%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+```{r}
+ggplot(science2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="SCIENCE,TECHNOLOGY AND ENGINEERING PROFESSION IN SCOTLAND")
+```
+This shows there was a continual increase with effect initializing from 2019 but with significant COVID effect in 2020.
+```{r}
+admin<- employ_scotland [,c("Date","Country","X41.Administrative.occupations")]
+```
+
+```{r}
+admin2 <- admin%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+```{r}
+ggplot(admin2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="ADMINISTRATIVE PROFESSION IN SCOTLAND")
+```
+This shows there was a slight increase in 2019 but with significant COVID effect increase in 2020
+```{r}
+construct<- employ_scotland[,c("Date","Country","X53.Skilled.construction.and.building.trades")]
+```
+
+```{r}
+construct2 <- construct%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+
+```{r}
+ggplot(construct2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="CONSTRUCTION AND BUILDING TRADES PROFESSION IN SCOTLAND")
+```
+This shows there was a continual decline with effect initializing from 2019 but with significant COVID effect decrease in 2020.
+
+```{r}
+agric<- employ_scotland[,c("Date","Country","X51.Skilled.agricultural.and.related.trades")]
+
+```
+
+```{r}
+agric2 <- agric%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+```{r}
+ggplot(agric2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="AGRICULTURAL PROFESSION IN SCOTLAND")
+```
+This shows there was a continual decline with effect initializing from 2019 but with significant COVID effect decrease in 2020.
+```{r}
+caring <- employ_scotland[,c("Date","Country","X61.Caring.personal.service.occupations")]
+```
+
+```{r}
+caring2 <- caring%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+```{r}
+ggplot(caring2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="CARING PROFESSION IN SCOTLAND")
+```
+This shows there was a decline with effect initializing from 2018 but with a slight change in trend in 2020.
+
+```{r}
+corporate <- employ_scotland[,c("Date","Country","X11.Corporate.managers.and.directors")]
+
+```
+
+```{r}
+corporate2 <- corporate%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+```{r}
+ggplot(corporate2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="CORPORATE PROFESSION IN SCOTLAND")
+
+```
+This shows there was a  decline with effect initializing from 2018 but with a slight change in trend in 2020
+
+
+```{r}
+health <- employ_scotland[,c("Date","Country","X22.Health.professionals")]
+
+```
+
+```{r}
+health2 <- health%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+
+```{r}
+ggplot(health2,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("years")+ylab("number of employed per profession")+theme_minimal()+labs(title="HEALTH PROFESSION IN SCOTLAND")
+```
+This shows there was a decline with effect initializing from 2018 but with almost no significance in 2020.
+

@@ -1,0 +1,145 @@
+---
+title: "IGP CORRELATION CODES"
+author: "PROJECT TEAM 1"
+date: "August 22"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(error = TRUE,comment=NA)
+```
+
+```{r}
+
+employment_data <- read.csv("merged_data.csv")
+```
+
+#glimpse the loaded csv file to check structure of dataset such as no of rows, no of column and variables data type
+
+
+```{r}
+source("mypackages.R")
+source("helperFunctions.R")
+library(dplyr)
+
+```
+
+```{r}
+library(tidyr)
+```
+
+
+```{r}
+filter_date<- subset(employment_data,employment_data$Date == c("2019","2020","2021"))
+```
+
+```{r}
+science <- filter_date[,c("Date","Country","X21.Science..research..engineering.and.technology.professionals")]
+```
+
+Here we make use of pivot wider which converts long data into wide data using the function pivot wider.
+```{r}
+science1 <- science%>%
+  pivot_wider(
+   names_from = 'Country',
+   values_from = 'X21.Science..research..engineering.and.technology.professionals'
+  )
+```
+
+```{r}
+with(science1, cor(England, Scotland))
+with(science1, cor.test(England, Scotland))
+```
+#This signifies a high positive correlation between the two countries.science, tech and engineering professions experienced a shift in the upward direction for both countries.
+
+
+```{r}
+construction <- filter_date[,c("Date","Country","X53.Skilled.construction.and.building.trades")]
+```
+
+```{r}
+construction1 <- construction%>%
+  pivot_wider(
+   names_from = 'Country',
+   values_from = 'X53.Skilled.construction.and.building.trades'
+  )
+```
+
+```{r}
+with(construction1, cor(Scotland, Wales))
+with(construction1, cor.test(Scotland, Wales))
+```
+
+```{r}
+transport <- filter_date[,c("Date","Country","X82.Transport.and.mobile.machine.drivers.and.operatives")]
+```
+
+```{r}
+transport1 <- transport%>%
+  pivot_wider(
+   names_from = 'Country',
+   values_from = 'X82.Transport.and.mobile.machine.drivers.and.operatives'
+  )
+```
+
+```{r}
+with(transport1, cor(Scotland, Wales))
+with(transport1, cor.test(Scotland, Wales))
+```
+#This signifies a high positive correlation between the two countries.Transport professions experienced a shift in the upward direction for both countries and there's a 6.6% probability that the null hypothesis is correct.
+
+
+```{r}
+protect <- filter_date[,c("Date","Country","X33.Protective.service.occupations")]
+```
+
+```{r}
+protect1 <- protect%>%
+  pivot_wider(
+   names_from = 'Country',
+   values_from = 'X33.Protective.service.occupations'
+  )
+```
+
+
+```{r}
+with(protect1, cor(Wales, Northern_Ireland))
+with(protect1, cor.test(Wales, Northern_Ireland))
+```
+
+```{r}
+health <- filter_date[,c("Date","Country","X22.Health.professionals")]
+```
+
+```{r}
+health1 <- health%>%
+  pivot_wider(
+   names_from = 'Country',
+   values_from = 'X22.Health.professionals'
+  )
+```
+
+```{r}
+with(health1, cor(England, Wales))
+with(health1, cor.test(England, Wales))
+```
+```{r}
+care <- filter_date[,c("Date","Country","X61.Caring.personal.service.occupations")]
+```
+
+```{r}
+care1 <- care%>%
+  pivot_wider(
+   names_from = 'Country',
+   values_from = 'X61.Caring.personal.service.occupations'
+  )
+```
+
+```{r}
+with(care1, cor(Scotland, England))
+with(care1, cor.test(Scotland, England))
+```

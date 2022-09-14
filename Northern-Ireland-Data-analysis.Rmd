@@ -1,0 +1,229 @@
+---
+title: "IGP DATA ANALYSIS"
+author: "PROJECT TEAM 1"
+date: "August 2022"
+output: pdf_document
+---
+```{r setup, include=FALSE}
+# do not change these options
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(error = TRUE,comment=NA)
+```
+
+#Data description
+
+
+This dataset is part of a larger dataset that has been collected to help to know the impact of Covid 19 Pandemic on the employment profession in the 4 regions of the UK and to also observe the various shifts that occurred in different professions as a result of this, paying particular attention to professions that gained, loss and constant.
+
+It contains the following variables:
+
+- Date
+- Country
+- 11 Corporate managers and directors
+- 21 Science, research, engineering and technology professionals
+- 22 Health professionals
+-	23 Teaching and educational professionals	
+- 24 Business, media and public service professionals 
+- 33 Protective service occupations
+- 34 Culture, media and sports occupations
+- 41 Administrative occupations
+- 42 Secretarial and related occupations
+- 51 Skilled agricultural and related trades
+- 53 Skilled construction and building trades 
+- 61 Caring personal service occupations
+- 62 Leisure, travel and related personal service occupations	
+- 81 Process, plant and machine operatives
+- 82 Transport and mobile machine drivers and operatives
+
+
+
+```{r libraries, include=FALSE}
+# load required libraries / additional files
+source("mypackages.R")
+source("helperFunctions.R")
+library(dplyr)
+```
+
+
+```{r data}
+# load dataset
+employment_data<-read.csv("merged_data.csv")
+#glimpse the loaded csv file to check structure of dataset such as no of rows, no of column and variables data type
+glimpse(employment_data)
+```
+
+
+# Data Preparation 
+
+We are interested in modelling the employment by professions where Country is equal to Northern Ireland.
+
+ 
+
+Rows of data with this property are selected and used to perform the rest of the analysis.
+
+# selecting the rows of data satisfying the property listed above
+```{r dataprep}
+n_ireland_data<-subset(employment_data,employment_data$Country =="Northern_Ireland")
+```
+
+The following exploratory data analysis will be done using descriptive statistics, exploratory graphs and linear correlation.
+
+summary(): To measure central tendency by checking for variation in mean, median, also for outliers. If variation or difference between mean and median is much then it means there's outliers.
+
+Skimr: this is another method used for summarizing data. It gives a broad set of summary statistics with a single function call.
+
+```{r}
+summary(n_ireland_data)
+```
+
+
+```{r}
+#The descriptive statistics used
+is.null(n_ireland_data)
+skimr::skim(n_ireland_data)
+```
+
+Summary shows there are no outliers as variations between mean and median in all professions are minimal.
+We checked for null values and got a boolean FALSE.
+ 
+ EXPLORATORY GRAPH ANALYSIS
+ 5 professions were selected and grouped into 3 categories and all visually analysed.
+ Pivot longer was used to convert the wide data to long data using the pivot longer function.
+ Line graphs were plotted showing 5 professions in each categories
+
+```{r}
+category1 <- n_ireland_data[,c("Date","Country","X11.Corporate.managers.and.directors","X21.Science..research..engineering.and.technology.professionals","X22.Health.professionals","X23.Teaching.and.educational.professionals","X24.Business..media.and.public.service.professionals")]
+
+```
+
+
+```{r}
+#library(tidyverse)
+category1_long <- category1%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+
+```{r}
+ggplot(category1_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Year of employment")+ylab("No of people employed per year")+theme_minimal()+labs(title="EMPLOYMENT CATEGORY1 IN NORTHERN IRELAND")
+```
+
+
+```{r}
+category2 <- n_ireland_data[,c("Date","Country","X33.Protective.service.occupations", "X34.Culture..media.and.sports.occupations","X41.Administrative.occupations","X42.Secretarial.and.related.occupations","X51.Skilled.agricultural.and.related.trades")]
+```
+
+
+```{r}
+#library(tidyverse)
+category2_long <- category2%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+
+```{r}
+ggplot(category2_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Year of employment")+ylab("No of people employed per year")+theme_minimal()+labs(title="EMPLOYMENT CATEGORY2 IN NORTHERN IRELAND")
+```
+
+
+```{r}
+category3 <- n_ireland_data[,c("Date","Country","X53.Skilled.construction.and.building.trades", "X61.Caring.personal.service.occupations", "X62.Leisure..travel.and.related.personal.service.occupations","X81.Process..plant.and.machine.operatives","X82.Transport.and.mobile.machine.drivers.and.operatives")]
+```
+
+
+```{r}
+#library(tidyverse)
+category3_long <- category3%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+```
+
+
+```{r}
+ggplot(category3_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Year of employment")+ylab("No of people employed per year")+theme_minimal()+labs(title="EMPLOYMENT CATEGORY3 IN NORTHERN IRELAND")
+```
+
+From the categories plotted, professions with notable changes were plotted individually to further highlight the changes.
+
+```{r}
+science<-n_ireland_data[,c("Date","Country","X21.Science..research..engineering.and.technology.professionals")]
+  
+science_long <- science%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+
+ggplot(science_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Year of employment")+ylab("No of people employed per year")+theme_minimal()+labs(title="SCIENCE PROFESSION IN NORTHERN IRELAND")
+```
+
+The graph shows an upward shift in science profession in Northern Ireland which started before covid 19 and continued further in 2020 indicating impact of covid 19 on science profession.
+
+```{r}
+teaching<-n_ireland_data[,c("Date","Country","X23.Teaching.and.educational.professionals")]
+  
+teaching_long <- teaching%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+
+ggplot(teaching_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Year of employment")+ylab("No of people employed per year")+theme_minimal()+labs(title="TEACHING PROFESSION IN NORTHERN IRELAND")
+```
+
+The graph shows an upward shift in teaching profession in Northern Ireland which started few years before covid 19 and continued further in 2020 indicating impact of covid 19 on teaching profession.
+
+```{r}
+secretarial<-n_ireland_data[,c("Date","Country","X42.Secretarial.and.related.occupations")]
+  
+secretarial_long <- secretarial%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+
+ggplot(secretarial_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Year of employment")+ylab("No of people employed per year")+theme_minimal()+labs(title="SECRETARIAL PROFESSION IN NORTHERN IRELAND")
+```
+
+The graph shows a downward shift in secretarial and related profession in Northern Ireland. The profession experienced a sharp downward progression during covid 19 despite having an upward progession few years before covid.
+
+```{r}
+leisure<-n_ireland_data[,c("Date","Country","X62.Leisure..travel.and.related.personal.service.occupations")]
+  
+leisure_long <- leisure%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+
+ggplot(leisure_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Year of employment")+ylab("No of people employed per year")+theme_minimal()+labs(title="LEISURE PROFESSION IN NORTHERN IRELAND")
+```
+
+The graph shows a downward shift in leisure profession in Northern Ireland. The profession has been experiencing a fall before covid but still have more drastic fall in 2020 during covid 19 .
+
+```{r}
+protective<-n_ireland_data[,c("Date","Country","X33.Protective.service.occupations")]
+  
+protective_long <- protective%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+
+ggplot(protective_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Date")+ylab("value")+theme_minimal()+labs(title="PROTECTIVE PROFESSION IN NORTHERN IRELAND")
+```
+
+The graph shows a slight downward shift in protective profession in Northern Ireland in the year 2020 during covid 19.
+
+```{r}
+skilled_agricultural<-n_ireland_data[,c("Date","Country","X51.Skilled.agricultural.and.related.trades")]
+  
+skilled_agricultural_long <- skilled_agricultural%>%
+  pivot_longer(
+   cols = starts_with("X") 
+  )
+
+ggplot(skilled_agricultural_long,aes(x=Date,y=value,col=as.factor(name)))+geom_line()+xlab("Date")+ylab("value")+theme_minimal()+labs(title="SKILLED AGRICULTURAL PROFESSION IN NORTHERN IRELAND")
+```
+
+The graph shows a huge downward shift in skilled agricultural profession in Northern Ireland which started few years before covid 19 and continued further in 2020 indicating impact of covid 19 on it
